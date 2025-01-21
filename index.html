@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Deficit Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+        }
+        .calculator {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input, select {
+            width: 200px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #4fc3f7;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            height: 40px;
+            box-sizing: border-box;
+            background-color: white;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%234fc3f7' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+        }
+        button {
+            background: linear-gradient(45deg, #2196f3, #0288d1);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .warning {
+            color: #d32f2f;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 8px;
+        }
+        .info {
+            color: #1976d2;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+        }
+        .unit-toggle {
+            margin: 20px 0;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .unit-toggle label {
+            margin: 0 15px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+        .unit-toggle input[type="radio"] {
+            width: auto;
+            height: auto;
+            margin-right: 5px;
+        }
+        h1 {
+            color: #0288d1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .page-title {
+            background-color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .resources {
+            margin-top: 20px;
+            text-align: left;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+        }
+        .resources h3 {
+            margin-top: 0;
+            color: #0288d1;
+        }
+        .resources a {
+            color: #1976d2;
+            text-decoration: none;
+            line-height: 1.8;
+            display: block;
+            margin: 8px 0;
+        }
+        .resources a:hover {
+            color: #0288d1;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-title">
+        <h1>Calorie Deficit Calculator</h1>
+        <p>Calculate your daily calorie needs and safe deficit options</p>
+    </div>
+
+    <div class="calculator">
+        <div class="unit-toggle">
+            <label>
+                <input type="radio" name="units" value="metric" checked onclick="toggleUnits('metric')">
+                Metric (kg/cm)
+            </label>
+            <label>
+                <input type="radio" name="units" value="imperial" onclick="toggleUnits('imperial')">
+                Imperial (lbs/in)
+            </label>
+        </div>
+
+        <div>
+            <label for="age">Age:</label><br>
+            <input type="number" id="age" min="10" max="120" placeholder="Enter age (10-120)">
+        </div>
+
+        <div>
+            <label for="gender">Gender:</label><br>
+            <select id="gender">
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="weight">Weight (<span id="weightUnit">kg</span>):</label><br>
+            <input type="number" id="weight" placeholder="Enter weight">
+        </div>
+
+        <div>
+            <label for="height">Height (<span id="heightUnit">cm</span>):</label><br>
+            <input type="number" id="height" step="1" placeholder="Enter height">
+        </div>
+
+        <div>
+            <label for="activity">Activity Level:</label><br>
+            <select id="activity">
+                <option value="">Select activity level</option>
+                <option value="1.2">Sedentary (little/no exercise)</option>
+                <option value="1.375">Light (exercise 1-3 days/week)</option>
+                <option value="1.55">Moderate (exercise 3-5 days/week)</option>
+                <option value="1.725">Very Active (exercise 6-7 days/week)</option>
+                <option value="1.9">Extra Active (very active & physical job)</option>
+            </select>
+        </div>
+
+        <button onclick="calculateCalories()">Calculate Calories</button>
+
+        <div id="results" class="results" style="display: none;">
+            <h3>Your Results:</h3>
+            <div id="bmr"></div>
+            <div id="tdee"></div>
+            <div id="deficits"></div>
+        </div>
+
+        <div class="resources">
+            <h3>Health Resources</h3>
+            <a href="https://www.cdc.gov/healthyweight/healthy_eating/index.html" target="_blank">CDC - Healthy Eating for a Healthy Weight</a>
+            <a href="https://www.nutrition.gov/topics/healthy-weight" target="_blank">Nutrition.gov - Healthy Weight Resources</a>
+            <p style="font-size: 0.9em; color: #666; margin-top: 15px;">Important: This calculator provides estimates. Consult with healthcare providers before starting any diet plan, especially for growing children and teens.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        function toggleUnits(unit) {
+            currentUnit = unit;
+            if (unit === 'metric') {
+                document.getElementById('weightUnit').textContent = 'kg';
+                document.getElementById('heightUnit').textContent = 'cm';
+            } else {
+                document.getElementById('weightUnit').textContent = 'lbs';
+                document.getElementById('heightUnit').textContent = 'inches';
+            }
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function calculateCalories() {
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            let weight = parseFloat(document.getElementById('weight').value);
+            let height = parseFloat(document.getElementById('height').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+
+            if (currentUnit === 'imperial') {
+                // Convert lbs to kg and inches to cm
+                weight = weight * 0.453592;
+                height = height * 2.54;
+            }
+
+            if (age && gender && weight && height && activity) {
+                // Calculate BMR using Mifflin-St Jeor Equation
+                let bmr;
+                if (gender === 'male') {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                } else {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                }
+
+                // Calculate TDEE
+                const tdee = bmr * activity;
+
+                // Calculate deficit options
+                const deficits = {
+                    mild: tdee - 250,
+                    moderate: tdee - 500,
+                    aggressive: tdee - 750
+                };
+
+                // Display results
+                const results = document.getElementById('results');
+                results.style.display = 'block';
+
+                document.getElementById('bmr').innerHTML = `
+                    <p>Your Basal Metabolic Rate (BMR): ${Math.round(bmr)} calories/day</p>
+                    <p class="info">This is how many calories your body burns at complete rest.</p>
+                `;
+
+                document.getElementById('tdee').innerHTML = `
+                    <p>Your Total Daily Energy Expenditure (TDEE): ${Math.round(tdee)} calories/day</p>
+                    <p class="info">This is your maintenance calories - eat this amount to maintain current weight.</p>
+                `;
+
+                let deficitHtml = '<h4>Calorie Deficit Options:</h4>';
+
+                // Add warning for young users
+                if (age < 18) {
+                    deficitHtml += `
+                        <div class="warning">
+                            Important Note for Teens: Your body is still growing and needs adequate nutrition. 
+                            Please consult with a doctor or registered dietitian before starting any calorie deficit.
+                            Focus on healthy eating habits and regular physical activity rather than strict calorie counting.
+                        </div>
+                    `;
+                }
+
+                // Show deficit options with expected weight loss
+                deficitHtml += `
+                    <p>Mild deficit (0.25 kg/0.5 lb per week):<br>
+                    ${Math.round(deficits.mild)} calories per day</p>
+                    
+                    <p>Moderate deficit (0.5 kg/1 lb per week):<br>
+                    ${Math.round(deficits.moderate)} calories per day</p>
+                    
+                    <p>Aggressive deficit (0.75 kg/1.5 lbs per week):<br>
+                    ${Math.round(deficits.aggressive)} calories per day</p>
+                `;
+
+                // Add minimum calorie warning
+                if (deficits.aggressive < 1200 && gender === 'female') {
+                    deficitHtml += `
+                        <div class="warning">
+                            Warning: Do not eat fewer than 1200 calories per day for females. 
+                            Choose a smaller deficit to ensure safe and sustainable weight loss.
+                        </div>
+                    `;
+                } else if (deficits.aggressive < 1500 && gender === 'male') {
+                    deficitHtml += `
+                        <div class="warning">
+                            Warning: Do not eat fewer than 1500 calories per day for males. 
+                            Choose a smaller deficit to ensure safe and sustainable weight loss.
+                        </div>
+                    `;
+                }
+
+                document.getElementById('deficits').innerHTML = deficitHtml;
+
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+    </script>
+</body>
+</html>
